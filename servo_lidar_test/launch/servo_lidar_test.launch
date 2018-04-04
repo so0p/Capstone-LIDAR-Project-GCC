@@ -1,0 +1,11 @@
+<launch>
+
+  <node name="servo_test_node.py" pkg="servo_lidar_test" type="servo_test_node.py" output="screen" />
+
+  <node name="controller.py" pkg="servo_lidar_test" type="controller_test_node.py" output="screen" />
+
+  <node name="pointCloud2_test_node.py" pkg="servo_lidar_test" type="pointCloud2_test_node.py" output="screen" />
+
+  <node pkg="rviz" type="rviz" name="rviz"  output="screen"/>
+
+</launch>
