@@ -27,7 +27,7 @@ def callbackForCordinates(msg):
 
 if __name__ == '__main__':
 
-    define_publish_rate = 6000
+    define_publish_rate = 7000
 
     number_of_data_poins = 10000 # Number of data points to be published
 
@@ -83,8 +83,12 @@ if __name__ == '__main__':
 
         
         #cloud_points = [[x1, 1.0, 1.0],[x2, 2.0, 0.0]]
-        cloud_points.append([x, y, z])
+        
+        if(x != 0 or y!=0 or z!=0):
 
+            cloud_points.append([x, y, z])
+
+        
         if (len(cloud_points) > number_of_data_poins):
 
             del(cloud_points[0])

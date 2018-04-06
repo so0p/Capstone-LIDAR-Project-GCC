@@ -41,7 +41,7 @@ def callbackTwo(msg):
 def callbackThree(msg):
 
     global servoAngle
-    servoAngle = msg.servoAngle
+    servoAngle = msg.servoAngle + 0.3316
      # Offseting servo
 
 
@@ -58,6 +58,7 @@ def main():
 
     count = 0 
     coordinates = []
+    desiredRange = 2
 
     ######t = input('hi, should I start Scanning?') #####input from user node
    
@@ -107,16 +108,28 @@ def main():
 
             rayAngle = startAngle + index * angleOfIncrement + math.pi / 2.0
             index = index + 1
-             
-            #r = 1 
+            
+
+            if(r > desiredRange or r < 0.08):
+
+                r = 0 
+
+            #rayAngle = 0
+
+
+
             
             #------------To publish single coordinates of x,y,z------------
-            msg.y = r * math.cos(rayAngle) * math.cos(servoAngle + (33.75*math.pi/180))
-            msg.x = r * math.sin(rayAngle) * math.cos(servoAngle + (33.75*math.pi/180))
-            msg.z = r * math.sin(servoAngle + (33.75*math.pi/180))
+            msg.y = r * math.cos(servoAngle) * math.sin(rayAngle)
+            msg.z = r * math.sin(servoAngle) * math.sin(rayAngle)
+            msg.x = r * math.cos(rayAngle)
 
+            #rospy.loginfo(r)
 
-             
+            #Denis new
+            # msg.y = r * math.sin(rayAngle)
+            # msg.x = r * math.cos(rayAngle) * math.cos(servoAngle)
+            # msg.z = r * math.cos(rayAngle) * math.sin(servoAngle)
 
 
             ## -------- To publish an array of x,y,z------------------------
