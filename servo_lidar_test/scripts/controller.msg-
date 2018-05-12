@@ -1,0 +1,5 @@
+Header header
+float64[] pointCloudCoordinates 
+float64 x
+float64 y
+float64 z
