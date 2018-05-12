@@ -10,6 +10,7 @@ project(servo_lidar_test)
 find_package(catkin REQUIRED COMPONENTS
  std_msgs
  nav_msgs
+ sensor_msgs
  message_generation
 )
 
@@ -57,12 +58,14 @@ find_package(catkin REQUIRED COMPONENTS
  )
 
 ## Generate services in the 'srv' folder
- #add_service_files(
-  # FILES
+ add_service_files(
+ FILES
+ controllerServo.srv
+ clientController.srv
    
    #Service1.srv
    #Service2.srv
- #)
+ )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -74,7 +77,11 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
-   std_msgs  # Or other packages containing msgs
+   std_msgs
+   nav_msgs
+   sensor_msgs
+   
+   # Or other packages containing msgs
  )
 
 ################################################
@@ -137,6 +144,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/servo_lidar_test_node.cpp)
+
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

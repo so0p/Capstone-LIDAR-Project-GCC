@@ -41,8 +41,8 @@ def callbackTwo(msg):
 def callbackThree(msg):
 
     global servoAngle
-    servoAngle = msg.servoAngle + 0.3316
-     # Offseting servo
+    servoAngle = msg.servoAngle + 0.3316 # Offseting servo
+     
 
 
 
@@ -51,14 +51,18 @@ def main():
 
     rospy.init_node('controller_test')
     
-    define_publish_rate = 6000 # Node Publish Rate
+    define_publish_rate = 40 # Node Publish Rate
 
 
     print("Starting the controller node.....")
 
     count = 0 
     coordinates = []
-    desiredRange = 2
+    x = []
+    y = []
+    z = []
+    desiredRangeMax = 3
+    desiredRangeMin = 0.1
 
     ######t = input('hi, should I start Scanning?') #####input from user node
    
@@ -90,9 +94,6 @@ def main():
     #header 
     msg.header.stamp = rospy.Time.now()
     
-    # msg2 = Num()
-    # msg2.num = 4
-    # msg2.name = "A"
 
     #--------------------------------------------------
     # Loop
@@ -110,43 +111,28 @@ def main():
             index = index + 1
             
 
-            if(r > desiredRange or r < 0.08):
+            if(r > desiredRangeMax or r < desiredRangeMin):
 
                 r = 0 
 
-            #rayAngle = 0
 
-
-
-            
             #------------To publish single coordinates of x,y,z------------
-            msg.y = r * math.cos(servoAngle) * math.sin(rayAngle)
-            msg.z = r * math.sin(servoAngle) * math.sin(rayAngle)
-            msg.x = r * math.cos(rayAngle)
+            y.append(r * math.cos(servoAngle) * math.sin(rayAngle))
+            z.append (r * math.sin(servoAngle) * math.sin(rayAngle))
+            x.append(r * math.cos(rayAngle))
 
-            #rospy.loginfo(r)
+            msg.x = x[:]
+            msg.y = y[:]
+            msg.z = z[:]
+            
 
-            #Denis new
-            # msg.y = r * math.sin(rayAngle)
-            # msg.x = r * math.cos(rayAngle) * math.cos(servoAngle)
-            # msg.z = r * math.cos(rayAngle) * math.sin(servoAngle)
+        pub.publish(msg)
+        del x[:]
+        del y[:]
+        del z[:]
 
-
-            ## -------- To publish an array of x,y,z------------------------
-            # y = r * math.cos(rayAngle) * math.cos(servoAngle + (33.75*math.pi/180))
-            # x = r * math.sin(rayAngle) * math.cos(servoAngle + (33.75*math.pi/180))
-            # z = - r * math.sin(servoAngle)
-
-            # coordinates.append([x,y,z])
-            # msg.pointCloudCoordinates = coordinates
-            pub.publish(msg)
-            #rospy.loginfo(rayAngle)
 
       
-        
-        
-        
-        
     
         rate.sleep()
 

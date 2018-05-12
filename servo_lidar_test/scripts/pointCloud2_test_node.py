@@ -8,28 +8,29 @@ import std_msgs.msg
 import sensor_msgs.point_cloud2 as pcl2
 from servo_lidar_test.msg import controller
 
-x = 0
-y = 0
-z = 0
+x = []
+y = []
+z = []
 
 def callbackForCordinates(msg):
 
     global x
     global y
     global z
+    global coordinatesArray
 
-    x = msg.x
-    y = msg.y
-    z = msg.z
-
-
+    x = msg.x[:]
+    y = msg.y[:]
+    z = msg.z[:]
+    #coordinatesArray = msg.pointCloudCoordinates[:]
+    
 
 
 if __name__ == '__main__':
 
-    define_publish_rate = 7000
+    define_publish_rate = 30
 
-    number_of_data_poins = 10000 # Number of data points to be published
+    number_of_data_poins = 60000 # Number of data points to be published
 
 
     rospy.init_node('pointCloud2_test')
@@ -68,38 +69,54 @@ if __name__ == '__main__':
     
     
     
-    #publish    
+    #Initialization 
     rospy.loginfo("happily publishing sample pointcloud.. !")
     count = 0
     cloud_points = []
+    coordinatesArray = []
 
     while not rospy.is_shutdown():
-        #count += 1
+       
+       
 
+        #----------------- For When getting x,y and z single points from controller node-------------------
+        # if(x != 0 or y!=0 or z!=0):
 
-
-        #x1 = math.sin(count)
-        #x2 = math.sin(count + math.pi)
-
-        
-        #cloud_points = [[x1, 1.0, 1.0],[x2, 2.0, 0.0]]
-        
-        if(x != 0 or y!=0 or z!=0):
-
-            cloud_points.append([x, y, z])
+        #     cloud_points.append([x, y, z])
 
         
-        if (len(cloud_points) > number_of_data_poins):
+        # if (len(cloud_points) > number_of_data_poins):
 
-            del(cloud_points[0])
+        #     del(cloud_points[0])
 
 
 
+
+
+        # #create pcl from points
+        # scaled_polygon_pcl = pcl2.create_cloud_xyz32(header, cloud_points)
+
+        # pcl_pub.publish(scaled_polygon_pcl)
+        #--------------------------------------------------------------------------------------
 
 
         #create pcl from points
-        scaled_polygon_pcl = pcl2.create_cloud_xyz32(header, cloud_points)
+        for i in range(len(x)):
 
+            if(x[i] != 0 or y[i]!=0 or z[i]!=0):
+
+                cloud_points.append([x[i], y[i], z[i]])
+
+            if (len(cloud_points) > number_of_data_poins):
+
+                  
+                  del(cloud_points[0])
+
+
+        
+
+        
+        scaled_polygon_pcl = pcl2.create_cloud_xyz32(header, cloud_points)
         pcl_pub.publish(scaled_polygon_pcl)
 
         rate.sleep()

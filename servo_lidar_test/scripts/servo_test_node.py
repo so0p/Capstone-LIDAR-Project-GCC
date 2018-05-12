@@ -17,11 +17,11 @@ p = Robotis_Servo( dyn, 1, series = "MX" )
 
 def main():
 
-  define_rate=7000 
-  count1= 3000 #900 in bits
-  count2= 1600 #8 in bits
+  define_rate = 40 
+  count1= 2500 #900 in bits
+  count2= 1200 #8 in bits
   home=0 #in radians
-  servo_speed = 0.8 # radians/sec
+  servo_speed = 0.05 # radians/sec
 
   pub = rospy.Publisher('chatter', String, queue_size=10)
   servo_pub = rospy.Publisher('servo_cmd', servo, queue_size=10)
@@ -35,6 +35,7 @@ def main():
 
   msg3 = servo()
     
+
   count = 0
 
   p.move_angle(home + servo_offset)
