@@ -6,13 +6,13 @@ import sys
 from sensor_msgs.msg import PointCloud2
 import std_msgs.msg
 import sensor_msgs.point_cloud2 as pcl2
-from servo_lidar_test.msg import controller
+from servo_lidar_test.msg import pointCloud
 
 x = []
 y = []
 z = []
 
-def callbackForCordinates(msg):
+def get_pointCloud_coordinates(msg):
 
     global x
     global y
@@ -28,20 +28,20 @@ def callbackForCordinates(msg):
 
 if __name__ == '__main__':
 
-    define_publish_rate = 30
+    pointCloude_publish_rate = 10
 
-    number_of_data_poins = 60000 # Number of data points to be published
+    number_of_data_poins = 15000 # Number of data points to be published
 
 
     rospy.init_node('pointCloud2_test')
 
-    rate = rospy.Rate(define_publish_rate)  # The while loop rate
+    rate = rospy.Rate(pointCloude_publish_rate)  # The while loop rate
 
     #--------------------------------------------------
     # Subscriber Setup
     #---------------------------------------------------
 
-    rospy.Subscriber('controller', controller, callbackForCordinates) # Subscribes to Adrik's lidar
+    rospy.Subscriber('pointCloud', pointCloud, get_pointCloud_coordinates) # Subscribes to Adrik's lidar
 
 
 
@@ -104,13 +104,10 @@ if __name__ == '__main__':
         for i in range(len(x)):
 
             if(x[i] != 0 or y[i]!=0 or z[i]!=0):
-
                 cloud_points.append([x[i], y[i], z[i]])
 
             if (len(cloud_points) > number_of_data_poins):
-
-                  
-                  del(cloud_points[0])
+                del(cloud_points[0])
 
 
         

@@ -1,7 +1,14 @@
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
+#include <servo_lidar_test/controller.h>
 
+#include "std_msgs/String.h"
+#include "std_msgs/Float64.h"
+#include "sensor_msgs/LaserScan.h"
+#include <vector>
 #include <cmath>
+
+
 
 int main( int argc, char** argv )
 {
@@ -25,14 +32,12 @@ int main( int argc, char** argv )
 
 
     points.id = 0;
-    line_strip.id = 1;
-    line_list.id = 2;
+    
 
 
 
     points.type = visualization_msgs::Marker::POINTS;
-    line_strip.type = visualization_msgs::Marker::LINE_STRIP;
-    line_list.type = visualization_msgs::Marker::LINE_LIST;
+  
 
 
 
@@ -40,26 +45,12 @@ int main( int argc, char** argv )
     points.scale.x = 0.2;
     points.scale.y = 0.2;
 
-    // LINE_STRIP/LINE_LIST markers use only the x component of scale, for the line width
-    line_strip.scale.x = 0.1;
-    line_list.scale.x = 0.1;
-
-
 
     // Points are green
     points.color.g = 1.0f;
     points.color.a = 1.0;
 
-    // Line strip is blue
-    line_strip.color.b = 1.0;
-    line_strip.color.a = 1.0;
-
-    // Line list is red
-    line_list.color.r = 1.0;
-    line_list.color.a = 1.0;
-
-
-
+    
     // Create the vertices for the points and lines
     for (uint32_t i = 0; i < 100; ++i)
     {
@@ -72,18 +63,17 @@ int main( int argc, char** argv )
       p.z = z;
 
       points.points.push_back(p);
-      line_strip.points.push_back(p);
+     
 
       // The line list needs two points for each line
-      line_list.points.push_back(p);
+      
       p.z += 1.0;
-      line_list.points.push_back(p);
+  
     }
 
 
     marker_pub.publish(points);
-    marker_pub.publish(line_strip);
-    marker_pub.publish(line_list);
+   
 
     r.sleep();
 

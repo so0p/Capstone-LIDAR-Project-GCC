@@ -8,9 +8,12 @@ project(servo_lidar_test)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+ roscpp
+ rospy
  std_msgs
  nav_msgs
  sensor_msgs
+ visualization_msgs
  message_generation
 )
 
@@ -52,7 +55,7 @@ find_package(catkin REQUIRED COMPONENTS
    FILES
    Num.msg
    servo.msg 
-   controller.msg
+   pointCloud.msg
    #Service1.srv
    #Service2.srv
  )
@@ -62,7 +65,7 @@ find_package(catkin REQUIRED COMPONENTS
  FILES
  controllerServo.srv
  clientController.srv
-   
+ controller_client.srv 
    #Service1.srv
    #Service2.srv
  )
@@ -116,7 +119,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
  # INCLUDE_DIRS include    Adrik comented this out because of the error during the catkin build
   LIBRARIES servo_lidar_test
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
+  CATKIN_DEPENDS std_msgs message_runtime
   DEPENDS system_lib
 )
 
@@ -141,6 +144,7 @@ include_directories(
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
+add_executable(points_and_lines src/points_and_lines.cpp)
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/servo_lidar_test_node.cpp)
@@ -158,6 +162,7 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
+target_link_libraries(points_and_lines ${catkin_LIBRARIES})
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )

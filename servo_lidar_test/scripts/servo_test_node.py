@@ -17,21 +17,21 @@ p = Robotis_Servo( dyn, 1, series = "MX" )
 
 def main():
 
-  define_rate = 40 
+  servo_publish_rate = 10 
   count1= 2500 #900 in bits
   count2= 1200 #8 in bits
   home=0 #in radians
-  servo_speed = 0.05 # radians/sec
+  servo_speed = 0.5# radians/sec
 
-  pub = rospy.Publisher('chatter', String, queue_size=10)
+  
   servo_pub = rospy.Publisher('servo_cmd', servo, queue_size=10)
 
-    #rospy.Subscriber("custom_chatter", Num, callbackThree)
+    #rospy.Subscriber("controller", controller, callbackThree)
     
    
   rospy.init_node('servo_test')
     
-  rate = rospy.Rate(define_rate)
+  rate = rospy.Rate(servo_publish_rate)
 
   msg3 = servo()
     
@@ -40,7 +40,6 @@ def main():
 
   p.move_angle(home + servo_offset)
   print(math.degrees(p.read_angle()))
-  p.set_angvel(1)
   p.set_angvel(servo_speed)
 
   while not rospy.is_shutdown():
