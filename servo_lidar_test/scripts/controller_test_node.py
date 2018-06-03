@@ -10,9 +10,11 @@ from servo_lidar_test.msg import pointCloud
 from servo_lidar_test.msg import servo
 from servo_lidar_test.srv import controller_client
 
+#Lidar And servo variables used in the controller node
 myRanges= []
 angleOfIncrement = 0
 startAngle = 0
+lidarAngleOffset = math.pi / 2.0 # Offseting lidar rays' angles by 90 degrees 
 
 
 servoAngle = 0
@@ -21,14 +23,8 @@ start_scan = 1
 
 
 
-# def callbackOne(msg):
-#     x = msg.pose.pose.position.x
-#     y = msg.pose.pose.position.y
-#     rospy.loginfo('x: {}, y: {}'. format(x, y))
-
+#Lidar callback function
 def get_lidar_data(msg):
-     
-  
     global myRanges    # Needs to be global to be used in the main
     global angleOfIncrement
     global startAngle
@@ -38,22 +34,18 @@ def get_lidar_data(msg):
     angleOfIncrement = msg.angle_increment
     startAngle = msg.angle_min
     rangeTime = msg.header
-
     #rospy.loginfo(myRanges)
      
-
+#servo callback function
 def get_servo_data(msg):
-
     global servoAngle
     global servoTime
     servoTime = msg.header
     servoAngle = msg.servoAngle + servoOffset
     print(servoTime)
-
      
-
+# server callback funtion (To be developed)
 def handle_start(req):
-
     start_scan = req.start 
     print  (req.start)
     return (req.start)
@@ -61,51 +53,49 @@ def handle_start(req):
 
 def main():
 
-    rospy.init_node('controller_test')
-    s = rospy.Service('controller_service_name', controller_client, handle_start) ####Vaneh
-    
-    controller_publish_rate = 10 # Node Publish Rate
-
-
+    rospy.init_node('controller_test')  #Node name in ROS
+    s = rospy.Service('controller_service_name', controller_client, handle_start) # Service setup (to be developed)
+    controller_publish_rate = 10 #  contrller node Publish Rate Hz
+   
+    #t = input('hi, should I start Scanning?') #input from user node(to be developed)
     print("Starting the controller node.....")
-
-    count = 0 
-    #coordinates = []
+   
+    #coordinates = []  # Can be used if publishing one point at a time
     x = []
     y = []
     z = []
-    desiredRangeMax = 6
-    desiredRangeMin = 0.1
 
-    ######t = input('hi, should I start Scanning?') #####input from user node
+    #Max and Min range to be pubblished by the controller node
+    RangeMax = 6     
+    RangeMin = 0.1
+
+
+    
    
     #--------------------------------------------------
     # Publisher Setup
     #--------------------------------------------------
     pub = rospy.Publisher('pointCloud', pointCloud, queue_size=10)
-    #pub2 = rospy.Publisher('custom_chatter', Num, queue_size=10)
-    
+   
 
-    
     #--------------------------------------------------
     # Subscriber Setup
     #--------------------------------------------------
-    #rospy.Subscriber("/odom", Odometry, callbackOne) For Odometry
     rospy.Subscriber("/scan", LaserScan, get_lidar_data)
     rospy.Subscriber("servo_cmd", servo, get_servo_data)
     
     
-
-    
     rospy.sleep(1.)
-    rate = rospy.Rate(controller_publish_rate)  # The while loop rate
+    rate = rospy.Rate(controller_publish_rate) 
     print("controller node started!")
     
-    msg = pointCloud()
-    #msg.pointCloudRanges = []
+    msg = pointCloud()          #Copying poindCloud message into msg variable
+    #msg.pointCloudRanges = []  #Can be used if publishing one point at a time
 
-    #header 
+    #Defining the node header 
     msg.header.stamp = rospy.Time.now()
+    msg.header.frame_id = 'controller'
+
     
 
     #--------------------------------------------------
@@ -114,20 +104,21 @@ def main():
     
     while not rospy.is_shutdown():
         
-        rayAngle = startAngle
-        index = 0
+        rayAngle = startAngle  #Assinging the initial angle of the publishing array
+        index = 0              #counter
+
         for r in myRanges:
 
-            rayAngle = startAngle + index * angleOfIncrement + math.pi / 2.0
-            incrementedServoAngle = servoAngle + index * 0.000117 
+            rayAngle = startAngle + index * angleOfIncrement + lidarAngleOffset
+            incrementedServoAngle = servoAngle + index * 0.000117 # interpolating the servo angle 
 
             index = index + 1
             
-            
-            if(r > desiredRangeMax or r < desiredRangeMin):
-
+             
+            if(r > RangeMax or r < RangeMin):     #If the lidar range is out of desired range assign zero to it
                 r = 0 
 
+            #------------Changing from polar to cartesian coordinates----------
 
             #------------To publish single coordinates of x,y,z------------
             # y.append(r * math.cos(servoAngle) * math.sin(rayAngle))
@@ -137,19 +128,19 @@ def main():
             y.append(r * math.cos(incrementedServoAngle) * math.sin(rayAngle))
             z.append (r * math.sin(incrementedServoAngle) * math.sin(rayAngle))
             x.append(r * math.cos(rayAngle))
+            #--------------------------------------------------------------
 
         msg.x = x[:]
         msg.y = y[:]
         msg.z = z[:]
             
-
+        #Publishing the coordinates
         pub.publish(msg)
         del x[:]
         del y[:]
         del z[:]
 
 
-      
     
         rate.sleep()
 
